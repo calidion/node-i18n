@@ -7,7 +7,7 @@
 This may be the simplest i18n module for nodejs and the web.
 
 ```ts
-import { I18n, II18nOption, IStorable, IListener } from 'node-i18n';
+import { I18n, II18nOption, IStorable, IListener } from 'node-i18n-core';
 const options: II18nOption = {
   current: 'en',                              // Use current because default is not allowed here.
   dir: path.resolve(__dirname, './locales'),  // Absolute path
@@ -15,13 +15,13 @@ const options: II18nOption = {
 
 const i18n = new I18n(options);
 
-// Use windows.localStorage as the IStorable interface
+// Use windows.localStorage as the IStorable interface on the web
 const i18n = new I18n(options, windows.localStorage);
 
 // Get Locale loaded from windows.localStorage
 i18n.getLocale();
 
-// Define an IStorable for your self
+// Define an IStorable for yourself
 const storage: IStorable = {
     getItem: (key: string): string => {
       return data[key];
@@ -45,5 +45,11 @@ const listener: IListener = (from, to) => {
   console.log("locale has changed from: " + from + " to :" + to );
 };
 i18n.listen(listener);
+
+// Get translated strings
+i18n._('TITLE');
+i18n._('TITLE.SUBTITLE.SUBTITLE');
+i18n._('TITLE', 'zh-CN');
+i18n._('TITLE.SUBTITLE.SUBTITLE', 'ja');
 
 ```

@@ -1,19 +1,18 @@
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import * as path from "path";
+import * as path from 'path';
 
 export interface II18nOption {
-  dir: string,
-  current: string,
+  dir: string;
+  current: string;
 }
 
 export interface ILocaleTranslation {
   [key: string]: JSON;
 }
 
-
 export interface IStorable {
-  getItem: (key: string) => string,
-  setItem: (key: string, value: string) => void
+  getItem: (key: string) => string;
+  setItem: (key: string, value: string) => void;
 }
 
 export type IListener = (from: string, to: string) => void;
@@ -40,7 +39,29 @@ export class I18n {
     this.load(this.options.dir);
   }
 
-  public get(locale: string): JSON {
+  public _(key: string, locale?: string): string {
+    if (!locale) {
+      locale = this.options.current;
+    }
+    let translation: any = this.translations[locale];
+
+    const keys = key.split('.');
+    keys.forEach((k: string) => {
+      if (translation) {
+        translation = translation[k];
+      }
+    });
+
+    if (!translation) {
+      return '';
+    }
+    if (typeof translation !== 'string') {
+      return "I18n Error Type: " + typeof translation;
+    }
+    return translation;
+  }
+
+  public getJSON(locale: string): JSON {
     return this.translations[locale];
   }
 
@@ -80,7 +101,7 @@ export class I18n {
   protected load(dir: string) {
     if (existsSync(dir)) {
       const files = readdirSync(dir);
-      files.forEach((filename) => {
+      files.forEach(filename => {
         const regex = I18n.LOCALE_REGEX.test(filename);
         if (regex) {
           const fullname = path.join(dir, filename);
@@ -90,7 +111,7 @@ export class I18n {
             this.translations[basename] = JSON.parse(String(json));
           }
         }
-      })
+      });
     }
   }
 }
