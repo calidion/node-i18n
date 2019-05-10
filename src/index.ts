@@ -1,7 +1,11 @@
+export * from './types';
+export { PlaceHolderLoader } from './loader/place-holder';
+export { FileSystemLoader } from './loader/fs';
+export { HTTPLoader } from './loader/http';
 
-import { II18nOption, IListener, ILocaleTranslation, IStorable } from "./types";
+import { II18nOption, IListener, ILocaleTranslation, IStorable } from './types';
 
-import { PlaceHolderLoader } from "./loader/place-holder";
+import { PlaceHolderLoader } from './loader/place-holder';
 
 export class I18n {
   public static LOCALE: string = 'locale';
@@ -13,8 +17,8 @@ export class I18n {
   protected options: II18nOption = {
     current: 'en',
     loader: PlaceHolderLoader,
-    url: "",
-  }
+    url: '',
+  };
   constructor(options: II18nOption, storage?: IStorable) {
     this.options = options;
     if (storage) {
@@ -27,8 +31,17 @@ export class I18n {
     if (!locale) {
       locale = this.options.current;
     }
-    let translation: any = await this.getJSON(locale);
+    return this.getTranslation(key, await this.getJSON(locale));
+  }
 
+  public _sync(key: string, locale?: string): string {
+    if (!locale) {
+      locale = this.options.current;
+    }
+    return this.getTranslation(key, this.translations[locale]);
+  }
+
+  public getTranslation(key: string, translation: any): string {
     const keys = key.split('.');
     keys.forEach((k: string) => {
       if (translation) {
@@ -47,11 +60,14 @@ export class I18n {
 
   public async getJSON(locale: string): Promise<JSON> {
     if (!I18n.LOCALE_REGEX.test(locale)) {
-      return JSON.parse("{}");
+      return JSON.parse('{}');
     }
     if (!this.translations[locale]) {
       const filename = locale + I18n.LOCALE_FILE_EXT;
-      this.translations[locale] = await this.options.loader(this.options.url, filename);
+      this.translations[locale] = await this.options.loader(
+        this.options.url,
+        filename
+      );
     }
     return this.translations[locale];
   }
@@ -86,6 +102,7 @@ export class I18n {
       this.changeObservers.push(observer);
     }
   }
+
   protected notify(from: string, to: string) {
     this.changeObservers.forEach(observer => observer(from, to));
   }

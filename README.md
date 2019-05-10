@@ -6,20 +6,86 @@
 
 This may be the simplest i18n module for nodejs and the web.
 
+# Locale Directory
+
+```
+locales/
+├── en.json
+├── en-US.json
+├── kr.json
+└── zh-CN.json
+```
+
+> All locale files must be kept within one directory, with file extension `.json` and in json format.
+
+# Usage
+
+## import
+
 ```ts
 import { I18n, II18nOption, IStorable, IListener } from 'node-i18n-core';
-const options: II18nOption = {
-  current: 'en',                              // Use current because default is not allowed here.
-  dir: path.resolve(__dirname, './locales'),  // Absolute path
-};
+```
 
+## Options
+
+There are three options in II18nOption.
+
+1. `current`: the current locale.
+2. `url`: an absolute path of file system or uri.
+3. `loader`: an async function through which locale data is read asynchronously
+
+## Loaders
+
+There are two Loaders, one is `FileSystemLoader`, the other is `HTTPLoader`.
+
+As their names imply, one is for file system, the other is for web served json files.
+
+### FileSystemLoader
+
+> `url` should be an absolute path
+
+```ts
+  const options: II18nOption = {
+    current: 'en',
+    loader: FileSystemLoader,
+    url: path.resolve(__dirname, './locales/'),
+  };
+```
+
+### HTTPLoader
+
+> `url` should be an uri path where json files are served
+
+```ts
+  const options: II18nOption = {
+    current: 'en',
+    loader: HTTPLoader,
+    url: 'http://www.yourdomain.com/xxx/locales/'
+  };
+```
+
+## Create I18n Instance
+
+You can specify your storage or not.
+
+```ts
 const i18n = new I18n(options);
 
 // Use windows.localStorage as the IStorable interface on the web
 const i18n = new I18n(options, windows.localStorage);
+```
 
+## Get Locale
+
+```ts
 // Get Locale loaded from windows.localStorage
 i18n.getLocale();
+```
+
+## Define Customzied IStorable object
+
+
+```ts
 
 // Define an IStorable for yourself
 const storage: IStorable = {
@@ -33,23 +99,41 @@ const storage: IStorable = {
 
 // Get Locale from a customzied IStorable instance
 i18n.getLocale(storage);
+```
 
+## Set Locale (Async)
+
+```ts
 // Set Locale to constructed storage
-i18n.setLocale('zh-CN');
+await i18n.setLocale('zh-CN');
 
 // Set Locale to a temporay storage
-i18n.setLocale('zh-CN', storage);
+await i18n.setLocale('zh-CN', storage);
+```
 
+
+## Add Change Observer
+
+```ts
 // Listen the locale change infomation
 const listener: IListener = (from, to) => {
   console.log("locale has changed from: " + from + " to :" + to );
 };
 i18n.listen(listener);
+```
 
-// Get translated strings
-i18n._('TITLE');
-i18n._('TITLE.SUBTITLE.SUBTITLE');
-i18n._('TITLE', 'zh-CN');
-i18n._('TITLE.SUBTITLE.SUBTITLE', 'ja');
+## Get Translation (Async)
 
+```ts
+// Get translated strings async
+await i18n._('TITLE');
+await i18n._('TITLE.SUBTITLE.SUBTITLE');
+await i18n._('TITLE', 'zh-CN');
+await i18n._('TITLE.SUBTITLE.SUBTITLE', 'ja');
+
+// Get translated strings, no await need, return '' if not loaded or error.
+ i18n._sync('TITLE');
+ i18n._sync('TITLE.SUBTITLE.SUBTITLE');
+ i18n._sync('TITLE', 'zh-CN');
+ i18n._sync('TITLE.SUBTITLE.SUBTITLE', 'ja');
 ```

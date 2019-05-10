@@ -1,12 +1,14 @@
-import * as axios from 'axios';
-import { ILoader } from "../types";
+import { default as axios } from 'axios';
+import { ILoader } from '../types';
 
-
-export const AxiosLoader: ILoader = (url: string): Promise<JSON> => {
-
+export const HTTPLoader: ILoader = async (
+  url: string,
+  filename: string
+): Promise<JSON> => {
   try {
-    return Promise.resolve(axios.get(url).data);
-  } catch(e) {
-    return Promise.resolve(JSON.parse("{}"));
+    const response = await axios.get(url + filename);
+    return response.data;
+  } catch (e) {
+    return JSON.parse('{}');
   }
-}
+};
