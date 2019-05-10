@@ -1,49 +1,33 @@
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import * as path from 'path';
 
-export interface II18nOption {
-  dir: string;
-  current: string;
-}
+import { II18nOption, IListener, ILocaleTranslation, IStorable } from "./types";
 
-export interface ILocaleTranslation {
-  [key: string]: JSON;
-}
-
-export interface IStorable {
-  getItem: (key: string) => string;
-  setItem: (key: string, value: string) => void;
-}
-
-export type IListener = (from: string, to: string) => void;
+import { PlaceHolderLoader } from "./loader/place-holder";
 
 export class I18n {
-  protected static LOCALE: string = 'locale';
-  protected static LOCALE_FILE_EXT: string = '.json';
-  protected static LOCALE_REGEX: RegExp = /^([a-z]{2})(-[A-Z]{2}){0,1}\.json$/;
+  public static LOCALE: string = 'locale';
+  public static LOCALE_FILE_EXT: string = '.json';
+  public static LOCALE_REGEX: RegExp = /^([a-z]{2})(-[A-Z]{2}){0,1}$/;
   protected changeObservers: IListener[] = [];
   protected translations: ILocaleTranslation = {};
   protected storage?: IStorable;
   protected options: II18nOption = {
     current: 'en',
-    dir: path.resolve(__dirname, './locales'),
-  };
-  constructor(options?: II18nOption, storage?: IStorable) {
-    if (options) {
-      this.options = options;
-    }
+    loader: PlaceHolderLoader,
+    url: "",
+  }
+  constructor(options: II18nOption, storage?: IStorable) {
+    this.options = options;
     if (storage) {
       this.storage = storage;
       this.getLocale(storage);
     }
-    this.load(this.options.dir);
   }
 
-  public _(key: string, locale?: string): string {
+  public async _(key: string, locale?: string): Promise<string> {
     if (!locale) {
       locale = this.options.current;
     }
-    let translation: any = this.translations[locale];
+    let translation: any = await this.getJSON(locale);
 
     const keys = key.split('.');
     keys.forEach((k: string) => {
@@ -61,11 +45,18 @@ export class I18n {
     return translation;
   }
 
-  public getJSON(locale: string): JSON {
+  public async getJSON(locale: string): Promise<JSON> {
+    if (!I18n.LOCALE_REGEX.test(locale)) {
+      return JSON.parse("{}");
+    }
+    if (!this.translations[locale]) {
+      const filename = locale + I18n.LOCALE_FILE_EXT;
+      this.translations[locale] = await this.options.loader(this.options.url, filename);
+    }
     return this.translations[locale];
   }
 
-  public setLocale(locale: string, storage?: IStorable) {
+  public async setLocale(locale: string, storage?: IStorable) {
     if (locale !== this.options.current) {
       const from = this.options.current;
       this.options.current = locale;
@@ -74,6 +65,7 @@ export class I18n {
       } else if (this.storage) {
         this.storage.setItem(I18n.LOCALE, locale);
       }
+      await this.getJSON(locale);
       this.notify(from, locale);
     }
   }
@@ -96,22 +88,5 @@ export class I18n {
   }
   protected notify(from: string, to: string) {
     this.changeObservers.forEach(observer => observer(from, to));
-  }
-
-  protected load(dir: string) {
-    if (existsSync(dir)) {
-      const files = readdirSync(dir);
-      files.forEach(filename => {
-        const regex = I18n.LOCALE_REGEX.test(filename);
-        if (regex) {
-          const fullname = path.join(dir, filename);
-          const basename = path.basename(filename, I18n.LOCALE_FILE_EXT);
-          const json = readFileSync(fullname);
-          if (json.length) {
-            this.translations[basename] = JSON.parse(String(json));
-          }
-        }
-      });
-    }
   }
 }
