@@ -75,6 +75,16 @@ const i18n = new I18n(options);
 const i18n = new I18n(options, windows.localStorage);
 ```
 
+## Init data
+
+To use translator, data must be initialized at first:
+
+```ts
+await i18n.init();
+```
+
+Now you have the json data prepared for access.
+
 ## Get Locale
 
 ```ts

@@ -27,6 +27,10 @@ export class I18n {
     }
   }
 
+  public async init() {
+    await this.setLocale(this.options.current, this.storage);
+  }
+
   public async _(key: string, locale?: string): Promise<string> {
     if (!locale) {
       locale = this.options.current;
@@ -73,6 +77,7 @@ export class I18n {
   }
 
   public async setLocale(locale: string, storage?: IStorable) {
+    await this.getJSON(locale);
     if (locale !== this.options.current) {
       const from = this.options.current;
       this.options.current = locale;
@@ -81,7 +86,6 @@ export class I18n {
       } else if (this.storage) {
         this.storage.setItem(I18n.LOCALE, locale);
       }
-      await this.getJSON(locale);
       this.notify(from, locale);
     }
   }

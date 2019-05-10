@@ -154,6 +154,8 @@ test('Should translate with http loader', async () => {
 
   const i18n: I18n = new I18n(options, storage);
 
+  await i18n.init();
+
   let count = 0;
   i18n.listen(() => {
     count++;
@@ -170,6 +172,12 @@ test('Should translate with http loader', async () => {
   i18n.listen(a);
   i18n.listen(a);
   i18n.listen(a);
+
+  const b = i18n._sync('b');
+  expect(b).toBe('bbbb');
+
+  await i18n.setLocale('ja');
+  expect(count).toBe(0);
 
   await i18n.setLocale('zh');
   expect(count).toBe(3);
