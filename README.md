@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/calidion/node-i18n.svg?branch=master)](https://travis-ci.org/calidion/node-i18n.svg?branch=master)
+[![Build Status](https://travis-ci.org/calidion/node-i18n.svg?branch=master)](https://travis-ci.org/calidion/node-i18n)
 [![Coverage Status](https://coveralls.io/repos/github/calidion/node-i18n/badge.svg?branch=master)](https://coveralls.io/github/calidion/node-i18n?branch=master)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 

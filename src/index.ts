@@ -56,7 +56,7 @@ export class I18n {
       return '';
     }
     if (typeof translation !== 'string') {
-      return "I18n Error Type: " + typeof translation;
+      return 'I18n Error Type: ' + typeof translation;
     }
     return translation;
   }

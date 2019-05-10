@@ -25,7 +25,7 @@ test('Should have load i18n data', () => {
   expect(en.a).toBe(100);
   const zhCN: any = i18n.getJSON('zh-CN');
   expect(zhCN.b).toBe(200);
-  expect(zhCN.c.d).toBe("1000");
+  expect(zhCN.c.d).toBe('1000');
   const enUS: any = i18n.getJSON('en-US');
   expect(enUS).toBeFalsy();
   const aa: any = i18n.getJSON('aa');
@@ -89,23 +89,19 @@ test('Should register observers', () => {
   const locale1 = i18n.getLocale();
   expect(locale1).toBe('zh');
 
-
   i18n.setLocale('zh-CN');
   const t = i18n._('c');
   console.log(t);
   expect(t).toBe('I18n Error Type: object');
   const t2 = i18n._('c.d');
-  expect(t2).toBe("1000");
-
+  expect(t2).toBe('1000');
 
   const t3 = i18n._('c.d', 'ja');
-  expect(t3).toBe("");
-
-
+  expect(t3).toBe('');
 
   const t4 = i18n._('c.d.e.f.g');
-  expect(t4).toBe("");
+  expect(t4).toBe('');
 
   const t5 = i18n._('name', 'kr');
-  expect(t5).toBe("Hello");
+  expect(t5).toBe('Hello');
 });
