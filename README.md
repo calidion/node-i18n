@@ -18,6 +18,13 @@ locales/
 
 > All locale files must be kept within one directory, with file extension `.json` and in json format.
 
+# Install
+
+```
+yarn add node-i18n-core
+# or 
+npm install node-i18n-core
+```
 # Usage
 
 ## import
