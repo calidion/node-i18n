@@ -30,7 +30,7 @@
     "watch:test": "jest --watch"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "@types/axios": "^0.14.0"
   },
   "devDependencies": {
